@@ -1,0 +1,70 @@
+---
+title: "ECON3170 - Project V1"
+author: "Oscar Ryberg"
+date: "`r Sys.Date()`"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Project outline
+
+The goal of the project is to utilize macroeconomic time-series from a variety of sources to make an h-step ahead forecast of Norways Real GDP. The general approach will be a series of steps where I begin by collecting and compiling the different series into a single database that can be used to replicate the analysis. 
+
+The time series I will use for this project will preferably be seasonally adjusted growht rates. This is because I want to avoid non-stationary time series, as It will be more challenging to work with series that exhibit clear trends, which might affect the predicted outcome. 
+
+## Data collection and sources
+
+The main source of the data in this project comes from the Federal Reserve Bank of St. Louis and their "Federal Reserve Econimic Data" (FRED). The database contains hundreds of thousands of time-series' that track economic variables both in the US and abroad.
+
+```{r}
+setwd("C:/Users/ofryberg/OneDrive - Universitetet i Oslo/ECON3170 - Project Data")
+
+library(readr)
+gdp_nor <- read_csv("CLVMNACSCAB1GQNO.csv")
+
+
+library(ggplot2)
+library(tidyverse)
+
+gdp_nor %>%
+  ggplot(aes(x=DATE, y = CLVMNACSCAB1GQNO))+
+  geom_line()
+
+gdp.ts = as.ts(gdp_nor$CLVMNACSCAB1GQNO)
+
+
+ar_fit = arima(gdp.ts, order = c(1,0,0))
+
+gdp_forecast = predict(ar_fit, n.ahead = 50)
+
+gdp_forecast_val = gdp_forecast$pred
+gdp_forecast_se = gdp_forecast$se
+
+plot.ts(gdp.ts, xlim = c(0, 280), , ylim = c(3e+04, 9e+05))
+points(gdp_forecast_val, type = "l", col = "2")
+points(gdp_forecast_val + 2*gdp_forecast_se, type = "l", col = 4, lty = 2)
+points(gdp_forecast_val - 2*gdp_forecast_se, type = "l", col = 4, lty = 2)
+```
+
+
+
+```{r}
+library(readxl)
+macroQ <- read_excel("NorData_rates.xls", 
+    sheet = "Quarterly")
+
+
+
+macroTs = as.ts(macroQ[, -1])
+
+
+
+
+
+
+
+
+```
